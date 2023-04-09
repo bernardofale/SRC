@@ -107,6 +107,9 @@ exit
 set nat source rule 10 outbound-interface eth0
 set nat source rule 10 source address 10.0.0.0/8
 set nat source rule 10 translation address 192.1.0.1-192.1.0.10
+set nat source rule 20 outbound-interface eth3
+set nat source rule 20 source address 10.0.0.0/8
+set nat source rule 20 translation address 192.1.0.1-192.1.0.10
 commit
 save
 exit
