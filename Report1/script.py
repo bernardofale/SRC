@@ -12,9 +12,9 @@ try:
 
     for ip in ips:
         ssh.exec_command("configure")
-        ssh.exec_command("set policy access-list 100 rule 11 action deny")
-        ssh.exec_command("set policy access-list 100 rule 11 destionation any")
-        ssh.exec_command("set policy access-list 100 rule 11  source host 200.32.43.4")
+        ssh.exec_command("set policy access-list 100 rule "+ sys.argv[1] +" action deny")
+        ssh.exec_command("set policy access-list 100 rule "+ sys.argv[1] +" destionation any")
+        ssh.exec_command("set policy access-list 100 rule "+ sys.argv[1] +" source host " +ip)
         ssh.exec_command("commit")
         ssh.exec_command("save")
         ssh.exec_command("exit")
