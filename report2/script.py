@@ -32,6 +32,18 @@ for a in addr:
 ### Read parquet data files
 df=pd.read_parquet(datafile)
 
+# Filter for connections with port 53 and protocol UDP
+filtered_df = df[(df['port'] == 53) & (df['proto'] == 'udp')]
+
+# Count the occurrences of each destination IP
+connection_counts = filtered_df['dst_ip'].value_counts().reset_index()
+connection_counts.columns = ['dst_ip', 'connection_count']
+
+# Sort the result in ascending order based on the destination IP
+connection_counts = connection_counts.sort_values('dst_ip', ascending=True)
+
+connection_counts.to_csv('multiple_connections.csv', index=False)
+
 '''
 # Get unique source IPs
 unique_src_ips = df['src_ip'].unique()
@@ -62,7 +74,7 @@ df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s') + pd.to_timedelta(df
 
 with open('data.csv', 'w+') as f:
     df.to_csv(f)
-'''
+
 
 
 
@@ -83,7 +95,7 @@ df_selected["is_outlier"] = (df_selected["up_bytes_zscore"].abs() > threshold) |
 with open('anom_outliers_data.csv', 'w+') as f:
     df_selected.to_csv(f)
 
-    
+
 # Calculate the total data transfer for each connection
 df["total_bytes"] = df["up_bytes"] + df["down_bytes"]
 
@@ -94,13 +106,15 @@ print(mean_bytes)
 print(std_bytes)
 
 # Set the threshold for identifying unusually large or small values
-threshold = 2.5 # Adjust this value based on your data and requirements
+threshold = 10 # Adjust this value based on your data and requirements
 
 # Identify unusually large or small values
 df["is_anomalous"] = (df["total_bytes"] > mean_bytes + threshold * std_bytes) | (df["total_bytes"] < mean_bytes - threshold * std_bytes)
 
-with open('anom_anomalous_data.csv', 'w+') as f:
-    df.to_csv(f)
+anomalous_df = df[df["is_anomalous"]]
+anomalous_df = anomalous_df.sort_values(by="total_bytes", ascending=False)
+anomalous_df.to_csv("anomalous_devices.csv", index=False)
+
 
 
 # Group the data by source IP
@@ -124,7 +138,7 @@ with open('anom_summary_data.csv', 'w+') as f:
 # Filter TCP and UDP data
 tcp_data = df[df["proto"] == "tcp"]
 udp_data = df[df["proto"] == "udp"]
-'''
+
 # TCP Up Bytes vs. Down Bytes
 plt.scatter(tcp_data["up_bytes"], tcp_data["down_bytes"])
 plt.xlabel("TCP Up Bytes")
