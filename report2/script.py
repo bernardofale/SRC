@@ -32,6 +32,15 @@ for a in addr:
 ### Read parquet data files
 df=pd.read_parquet(datafile)
 
+data = pd.read_csv('data.csv')
+# Filter the data for the specified source IP
+filtered_data = data[data['dst_ip'] == '192.168.108.226']
+# Filter the data for the specified source IP
+filtered_data = data[data['dst_ip'] == '191.168.108.226']
+
+# Group the filtered data by the 'dst_ip' column and sum the 'up_bytes' and 'down_bytes'
+connection_bytes = filtered_data.groupby('src_ip').agg({'up_bytes': 'sum', 'down_bytes': 'sum'})
+connection_bytes.to_csv('connectionss.csv')
 # Filter for connections with port 53 and protocol UDP
 filtered_df = df[(df['port'] == 53) & (df['proto'] == 'udp')]
 
